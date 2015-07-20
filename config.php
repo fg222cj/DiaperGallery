@@ -27,4 +27,5 @@ define("DBIMAGETABLEURLTHUMBNAIL", "url_thumbnail");
 define("IMAGEDIAPERPATH", "images/diapers/");
 
 define("IMAGETHUMBNAILWIDTH", "100");
+
 ?>

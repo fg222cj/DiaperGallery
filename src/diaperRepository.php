@@ -21,9 +21,9 @@ class DiaperRepository extends Repository {
 
         $image;
         if(isset($image)) {
-            $this->imageRepository->saveOnServer($image, $diaper->getName());
+            $diaper->setImage($this->imageRepository->saveOnServer($image, $diaper->getName()));
             $imageId = $this->imageRepository->add($diaper->getImage());
-            $diaper->setImage($this->imageRepository->getById($imageId));
+            $diaper->getImage()->setId($imageId);
         }
 
         $sql = "INSERT IGNORE INTO " . DBDIAPERTABLE . " (" . DBDIAPERTABLENAME . ", " . DBDIAPERTABLEYEAR . ",

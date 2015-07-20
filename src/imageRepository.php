@@ -5,9 +5,10 @@
  * Date: 2015-07-19
  * Time: 19:31
  */
+require_once("src/repository.php");
 require_once("src/image.php");
 
-class ImageRepository {
+class ImageRepository extends Repository{
     public function add(Image $image) {
         $db = $this->connection();
 
@@ -17,7 +18,7 @@ class ImageRepository {
         $query = $db->prepare($sql);
         $query->execute($params);
 
-        return $db->insert_id;
+        return $db->lastInsertId();
     }
 
     public function getAllFromDb() {
@@ -62,17 +63,17 @@ class ImageRepository {
     public function saveOnServer($image, $name) {
         $targetDir = IMAGEDIAPERPATH;
         $imagePath = $targetDir . $this->createFilename(basename($image["name"]), $name);
-        $thumbnailPath = $targetDir . $this->createFilename(basename($image["name"]), $name, true);
+        $thumbnailPath = $targetDir . $this->createFilename($imagePath, $name, true);
 
         if (move_uploaded_file($image["tmp_name"], $imagePath)) {
             $this->createThumbnail($imagePath, $thumbnailPath);
+            return new Image(0, $imagePath, $thumbnailPath);
         } else {
             echo "Sorry, there was an error uploading your file.";
         }
     }
 
     public function createThumbnail($imagePath, $thumbnailPath) {
-        echo"CreateThumb: code entered <br />";
         if(preg_match('/[.](jpg)$/', $imagePath)) {
             $im = imagecreatefromjpeg($imagePath);
         } else if (preg_match('/[.](gif)$/', $imagePath)) {
@@ -100,7 +101,7 @@ class ImageRepository {
 
         $cleanName = str_replace(" ", "_", $name);
         $cleanName = strtolower($cleanName);
-        preg_replace("/[^a-z0-9_]/", '', $cleanName);
+        $cleanName = preg_replace("/[^a-z0-9_]/", '', $cleanName);
 
         $filepath = $cleanName . "." . $extension;
         $i = 0;
