@@ -25,6 +25,9 @@ if(isset($_POST) && isset($_POST['diaper_name']) && isset($_POST['diaper_year'])
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>gDiapers</title>
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/theme.css">
+    <link href="js/lightbox2-master/dist/css/lightbox.css" rel="stylesheet">
 </head>
 <body>
 <form enctype="multipart/form-data" action="" method="post">
@@ -41,13 +44,36 @@ if(isset($_POST) && isset($_POST['diaper_name']) && isset($_POST['diaper_year'])
 
 <?php
 $diapers = $diaperRepository->getAllFromDb();
+usort($diapers, "cmp"); // Sort the array according to the compare function below
+
+$diaperRarity = $diapers[0]->getRarity();
+
+echo "<div class='rarity" . $diaperRarity . "'>";
+
 foreach($diapers as $diaper) {
-    echo "  <div>
+    if($diaperRarity !== $diaper->getRarity()) {
+        $diaperRarity = $diaper->getRarity();
+        echo "</div>";
+        echo "<div class='rarity" . $diaperRarity . "'>";
+    }
+
+    echo "  <span>
             <h3>" . $diaper->getName() . "</h3>
+            <a href='" . $diaper->getImage()->getUrl() . "' data-lightbox='diaper-image-set' data-title='" . $diaper->getName() . "'>
             <img src='" . $diaper->getImage()->getUrlThumbnail() . "' />
-            </div>";
+            </a>
+            </span>";
+    if($newRow) {
+
+    }
+    $newRow = false;
+}
+echo "</div>";
+
+function cmp($diaperA, $diaperB) {
+    return  $diaperB->getRarity() - $diaperA->getRarity();
 }
 ?>
-
+<script src="js/lightbox2-master/dist/js/lightbox.js"></script>
 </body>
 </html>
